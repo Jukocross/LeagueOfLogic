@@ -1,0 +1,24 @@
+module adderUnit (
+    input a[16],  // clock
+    input b[16],
+    input alufn_signal[6],  // reset
+    output out[16],
+    output z,
+    output v,
+    output n    
+  ) {
+  
+  sig s[16];
+  
+  always {
+    case(alufn_signal[0]){
+      b0: s = a + b;
+      b1: s = a - b;
+      default: s = 16b0;
+      }
+    out = s;
+    z = ~|s;//All zeros
+    n = s[15];//negative
+    v = (a[15] & (b[15] ^ alufn_signal[0]) & !s[15]) | (!a[15] & !(b[15] ^ alufn_signal[0]) & s[15]);//overflow
+  }
+}

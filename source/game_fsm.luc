@@ -1,0 +1,245 @@
+module game_fsm (
+    input clk,  // clock
+    input rst,  // reset
+    //input variable_register,
+    input a_input[3],
+    input a_submit,
+    input b_input[3],
+    input b_submit,
+    input aluresult[16],
+    output werf, //to write_enable
+    output ra[4],
+    output rb[4],
+    output rc[4],
+    output bsel[2],
+    output alufn_signal[6],
+    output wdsel,
+    output initReg,
+    output resetReg,
+    output aluResultSelect[1],
+    output ts,
+    output fsminput[16],
+    output winner_a,
+    output winner_b
+  ) {
+ 
+  .clk(clk){
+    .rst(rst){
+      variable_3bit_generator randomGenerator;
+      fsm full_fsm={IDLE, START, INIT, QUESTION_GETA, QUESTION_GETB, QUESTION_GETLOGIC, QUESTION_GETANSWER, 
+                    QUESTION_GETTIMER, COUNTDOWN_IDLE, COUNTDOWN_LOADAINPUT, COUNTDOWN_LOADBINPUT, COUNTDOWN_CHECKAINPUT,
+                    COUNTDOWN_CHECKBINPUT, COUNTDOWN_UPDATEASCORE,COUNTDOWN_UPDATEBSCORE, ANSWERED, ROUNDPLUSONE, SETWINNERTIMER,
+                    WINNER, DISPLAYWINNERA, DISPLAYWINNERB, RESET};
+      dff previousLogic[3];
+      }
+    }
+  always {
+    werf = 0;
+    ra = 0;
+    rb = 0;
+    rc = 0;
+    bsel = 0;
+    alufn_signal = 0;
+    wdsel = 0;
+    initReg = 0;
+    resetReg = 0;
+    aluResultSelect = 0;
+    ts = 0;
+    fsminput = 0;
+    winner_a = 0;
+    winner_b = 0;
+    case(full_fsm.q){
+      full_fsm.START:
+            if (a_submit == 1 || b_submit ==1 ){
+              full_fsm.d = full_fsm.INIT;
+          }
+      full_fsm.INIT:
+            initReg = 1;
+            full_fsm.d = full_fsm.QUESTION_GETA;
+      full_fsm.QUESTION_GETA:
+              werf = 1;
+              rc = h3;
+              wdsel = 1b1;
+              fsminput = randomGenerator.threeBitValue;
+              full_fsm.d = full_fsm.QUESTION_GETB;
+      full_fsm.QUESTION_GETB:
+              werf = 1;
+              rc = h4;
+              wdsel = 1b1;
+              fsminput = randomGenerator.threeBitValue;
+              full_fsm.d = full_fsm.QUESTION_GETLOGIC;
+      full_fsm.QUESTION_GETLOGIC:
+              if(previousLogic.q != randomGenerator.threeBitValue && randomGenerator.threeBitValue <=5){
+             werf = 1;
+             rc = h5;
+             wdsel = 1b1;
+             fsminput = randomGenerator.threeBitValue;
+             previousLogic.d = randomGenerator.threeBitValue;
+             full_fsm.d = full_fsm.QUESTION_GETANSWER;
+          }
+      full_fsm.QUESTION_GETANSWER:
+             werf = 1;
+             ra = h3;
+             rb = h4;
+             rc = h6;
+             bsel = 2b00;
+             wdsel = 1b0;
+             case(previousLogic.q){
+                3b000: alufn_signal = 6b011000; //AND
+                3b001: alufn_signal = 6b010111; //NAND
+                3b010: alufn_signal = 6b011110; //OR
+                3b011: alufn_signal = 6b010001; //NOR
+                3b100: alufn_signal = 6b010110; //XOR
+                3b101: alufn_signal = 6b011001; //XNOR
+                default: alufn_signal=6b011000;
+          }
+            full_fsm.d = full_fsm.QUESTION_GETTIMER;
+      full_fsm.QUESTION_GETTIMER:
+            werf = 1;
+            rc = h2;
+            fsminput = 16h0005;
+            wdsel = 1b1;
+            full_fsm.d = full_fsm.COUNTDOWN_IDLE;
+      full_fsm.COUNTDOWN_IDLE:
+            ts = 1;
+            ra = h2;
+            bsel = 2b01;
+            alufn_signal = 6b110011;
+            aluResultSelect = 1;
+            if (aluresult == 1){
+            full_fsm.d = full_fsm.QUESTION_GETA;
+          }
+            if (a_submit == 1){
+               full_fsm.d = full_fsm.COUNTDOWN_LOADAINPUT;
+          }
+            if (b_submit == 1){
+              full_fsm.d = full_fsm.COUNTDOWN_LOADBINPUT;
+           }
+      full_fsm.COUNTDOWN_LOADAINPUT:
+            werf = 1;
+            rc = h7;
+            wdsel = 1b1;
+            fsminput = a_input;   
+            aluResultSelect = 0;
+            full_fsm.d = full_fsm.COUNTDOWN_CHECKAINPUT;
+      full_fsm.COUNTDOWN_LOADBINPUT:
+            werf = 1;
+            rc = h7;
+            wdsel = 1b1;
+            fsminput = b_input;
+            aluResultSelect = 0;
+            full_fsm.d = full_fsm.COUNTDOWN_CHECKBINPUT;
+      full_fsm.COUNTDOWN_CHECKAINPUT:
+           ra = h6;
+           rb = h7;
+           bsel = 2b00;
+           alufn_signal = 6b110011;
+           aluResultSelect = 1;
+           if (aluresult == 1){
+              full_fsm.d = full_fsm.COUNTDOWN_UPDATEASCORE;
+            }
+           if (aluresult == 0){
+              full_fsm.d = full_fsm.COUNTDOWN_IDLE;
+            }
+      full_fsm.COUNTDOWN_CHECKBINPUT:
+           ra = h6;
+           rb = h7;
+           bsel = 2b00;
+           alufn_signal = 6b110011;
+           aluResultSelect = 1;
+           if (aluresult == 1){
+              full_fsm.d = full_fsm.COUNTDOWN_UPDATEBSCORE;
+            }
+           if (aluresult == 0){
+              full_fsm.d = full_fsm.COUNTDOWN_IDLE;
+            }
+      full_fsm.COUNTDOWN_UPDATEASCORE:
+          werf = 1;
+          ra = h0;
+          rc = h0;
+          bsel = 2b10;
+          alufn_signal = 6b000000;
+          wdsel = 1b0;
+          aluResultSelect = 0;
+          full_fsm.d = full_fsm.ANSWERED;
+      full_fsm.COUNTDOWN_UPDATEBSCORE:
+          werf = 1;
+          ra = h1;
+          rc = h1;
+          bsel = 2b10;
+          alufn_signal = 6b000000;
+          wdsel = 1b0;
+          aluResultSelect = 0;
+          full_fsm.d = full_fsm.ANSWERED;
+      full_fsm.ANSWERED:
+                ra = h8;
+                bsel = 2b11; //0x0005
+                alufn_signal = 6b110011; //CMPEQ
+                aluResultSelect = 1; 
+                if (aluresult == 1){
+                //Input all control signal to check for 
+               full_fsm.d = full_fsm.SETWINNERTIMER;
+          }
+                if (aluresult == 0) { //Round + 1
+               full_fsm.d = full_fsm.ROUNDPLUSONE;
+          }
+      full_fsm.ROUNDPLUSONE:
+               werf = 1;
+               ra = h8;
+               rc = h8;
+               bsel = 2b10;  
+               alufn_signal = 6b000000;
+               wdsel = 2b0;
+               full_fsm.d = full_fsm.QUESTION_GETA;
+      full_fsm.SETWINNERTIMER:
+               werf = 1;
+               rc = h2;
+               fsminput = 16h005;
+               wdsel = 1b1;
+               full_fsm.d = full_fsm.WINNER;
+      full_fsm.WINNER:
+               ra = h0;
+               rb = h1;
+               bsel = 2b00;
+               alufn_signal = 6b110101;//If less than
+               aluResultSelect = 1;
+               if (aluresult == 1){
+               full_fsm.d = full_fsm.DISPLAYWINNERB;
+                //A winner
+          }
+               if (aluresult == 0){
+               full_fsm.d = full_fsm.DISPLAYWINNERA;
+          }
+       full_fsm.DISPLAYWINNERA:
+              winner_a = 1;
+              ts = 1;
+              ra = h2;
+              bsel = 2b01;
+              alufn_signal = 6b11011;
+              aluResultSelect = 1;
+              if  (aluresult == 1){
+                full_fsm.d = full_fsm.IDLE;
+          }
+      full_fsm.DISPLAYWINNERB:
+              winner_b = 1;
+              ts = 1;
+              ra = h2;
+              bsel = 2b01;
+              alufn_signal = 6b110011;
+              aluResultSelect = 1;
+              if  (aluresult == 1){
+                full_fsm.d = full_fsm.IDLE;
+          }
+      full_fsm.IDLE:
+            if (a_submit == 1 || b_submit == 1 ){
+              full_fsm.d = full_fsm.RESET;
+          }
+      full_fsm.RESET:
+               resetReg = 1;
+               full_fsm.d = full_fsm.START;
+      default: 
+               full_fsm.d = full_fsm.IDLE;
+      }
+    
+  }
+}

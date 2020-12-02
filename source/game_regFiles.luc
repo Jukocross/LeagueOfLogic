@@ -1,0 +1,74 @@
+module game_regFiles (
+    input clk,  // clock
+    input rst,  // reset
+    input write_address[4], //write address
+    input we, //write enable
+    input data[16],
+    
+    input read_address_a[4],
+    input read_address_b[4],
+    
+    input init,
+    input reset,
+    input ts,
+    
+    output out_a[16],
+    output out_b[16],
+    
+    output player_a_score_display[16],
+    output player_b_score_display[16],
+    
+    output question_A_display[16],
+    output question_B_display[16],
+    output question_Logic_display[16],
+    output time_countdown[16],
+    
+    output round_display[16]
+  ) {
+  
+  .clk(clk){
+    edge_detector time_edge;
+    .rst(rst){
+      dff registers[16][16];
+      counter timer(#SIZE(1), #DIV(26));
+      }
+    }
+
+  always {
+    out_a = registers.q[read_address_a];
+    out_b = registers.q[read_address_b];
+    time_edge.in = timer.value;
+    
+    if (init == 1){
+      registers.d[h0] = 0; //Player A score
+      registers.d[h1] = 0; //Player B score
+      registers.d[h8] = 1; //Round 
+      }
+    
+    if (reset == 1){
+      registers.d = 16x{{16h0000}};
+      }
+    
+    if (ts == 1 && time_edge.out){
+      if (registers.q[h2] != 0){
+      registers.d[h2] = registers.q[h2] - 1; 
+        }       
+      }
+    
+    if(we == 1){
+      registers.d[write_address] = data;
+      }
+    
+    player_a_score_display = registers.q[h0]; //Static display for player a score
+    player_b_score_display = registers.q[h1]; //Static display for player b score
+    
+    question_A_display  = registers.q[h3];
+    question_B_display = registers.q[h4];
+    question_Logic_display = registers.q[h5];
+    
+    time_countdown = registers.q[h2]; //Static display for the time_countdown
+    
+    round_display = registers.q[h8]; //Static display for round_display
+    
+  }
+}

@@ -1,0 +1,60 @@
+pin clk CLOCK;
+clock clk 100MHz;
+
+pin rst_n RESET;
+
+// flip the Tx/Rx lines
+pin usb_rx USB_TX;
+pin usb_tx USB_RX;
+
+pin io_sel[0] A33;
+pin io_sel[1] A34;
+pin io_sel[2] A18;
+pin io_sel[3] A17;
+
+pin io_seg[0] A39;
+pin io_seg[1] A40;
+pin io_seg[2] A42;
+pin io_seg[3] A43;
+pin io_seg[4] A9;
+pin io_seg[5] A12;
+pin io_seg[6] A11;
+
+pin section_A_sel[0] B27;
+pin section_A_sel[1] B28;
+pin section_A_sel[2] B24;
+
+pin section_A_seg[0] B30; //a
+pin section_A_seg[1] B31; //b
+pin section_A_seg[2] B21; //c
+pin section_A_seg[3] B20; //d
+pin section_A_seg[4] B33; //e
+pin section_A_seg[5] B34; //f
+pin section_A_seg[6] B18; //g
+
+pin section_B_sel[0] C28; 
+pin section_B_sel[1] C27;
+pin section_B_sel[2] C23;
+
+pin section_B_seg[0] C34; //a
+pin section_B_seg[1] C33; //b
+pin section_B_seg[2] C17;  //c
+pin section_B_seg[3] C21;  //d
+pin section_B_seg[4] C37; //e
+pin section_B_seg[5] C36; //f
+pin section_B_seg[6] C14; //g
+
+pin player_a_input[0] B39 pulldown;
+pin player_a_input[1] B40 pulldown;
+pin player_a_input[2] B12 pulldown;
+pin player_submit[0] B11 pulldown;
+
+pin player_b_input[0] A27 pulldown;
+pin player_b_input[1] A28 pulldown;
+pin player_b_input[2] A24 pulldown;
+
+pin player_submit[1] A23 pulldown;
+
+
+
+

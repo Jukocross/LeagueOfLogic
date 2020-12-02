@@ -1,0 +1,69 @@
+module au_top (
+    input clk,              // 100MHz clock
+    input rst_n,            // reset button (active low)
+    input usb_rx,
+    input player_a_input[3],
+    input player_submit[2],
+    input player_b_input[3],
+    output usb_tx,
+    output io_seg [7],      // 7-segment LEDs on IO Shield
+    output io_sel [4],      // Digit select on IO Shield
+    output section_A_sel[3],
+    output section_B_sel[3],
+    output section_A_seg[7],
+    output section_B_seg[7]
+    
+      ) {
+  sig rst, logic_display_segValue[20], section_A_segValue[20], section_B_segValue[20];
+  //counter slowclock(#SIZE(1), #DIV(2), .clk(clk), .rst(rst));
+  //button_controller buttons(.clk(slowclock.value));
+  //input_fsm system_fsm(.clk(slowclock.value),.rst(rst));
+  .clk(clk) {
+    reset_conditioner reset_cond;
+    button_controller buttons;
+    .rst(rst){
+      counter seven_seg_counter(#SIZE(2), #DIV(15));
+      game_Controller game;
+      }
+  }
+  seven_seg_select_digit digit(.in(seven_seg_counter.value));//Declare the selector for the seven segment digit position
+  seven_seg_select_value_negate seven_seg_value(.in(seven_seg_counter.value), .value(logic_display_segValue));
+  seven_seg_select_value_negate section_A_seg_value(.in(seven_seg_counter.value), .value(section_A_segValue));
+  seven_seg_select_value_negate section_B_seg_value(.in(seven_seg_counter.value), .value(section_B_segValue));
+
+  always {
+  
+    reset_cond.in = ~rst_n; // input raw inverted reset signal
+    rst = reset_cond.out; // conditioned reset
+    
+    usb_tx = usb_rx; //loop serial port
+    
+    buttons.io_button = player_submit;
+    
+    game.a_input = player_a_input;
+    game.b_input = player_b_input;
+    game.b_submit = buttons.player_a_submit;
+    game.a_submit = buttons.player_b_submit;
+    
+           
+    logic_display_segValue = game.question_Logic_display;
+    section_A_segValue[19:15] = 5h1F;    
+    section_A_segValue[14:10] = game.question_A_display[2:0];
+    section_A_segValue[9:5] = game.round_display[2:0];
+    section_A_segValue[4:0] = game.time_countdown[2:0];
+    section_B_segValue[19:15] = 5h1F;
+    section_B_segValue[14:10] = game.player_a_score_display[2:0];
+    section_B_segValue[9:5] = game.player_b_score_display[2:0];
+    section_B_segValue[4:0] = game.question_B_display[2:0];
+    
+    io_seg = seven_seg_value.out[6:0];
+    io_sel = digit.out;
+    
+    section_A_sel = digit.out[2:0];
+    section_B_sel = digit.out[2:0];
+    
+    section_A_seg = section_A_seg_value.out[6:0];
+    section_B_seg = section_B_seg_value.out[6:0];
+    
+  }
+}

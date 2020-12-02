@@ -1,0 +1,25 @@
+module button_controller (
+    input clk,  // clock
+    input io_button[2],
+    output player_a_submit,
+    output player_b_submit    
+  ) {
+  .clk(clk){
+    button_conditioner a_button;
+    edge_detector a_ed(#RISE(1), #FALL(0));
+    button_conditioner b_button;
+    edge_detector b_ed(#RISE(1), #FALL(0));
+    }
+  
+
+  always {
+    a_button.in = io_button[0];
+    a_ed.in = a_button.out;
+    player_a_submit = a_ed.out;
+    
+    b_button.in = io_button[1];
+    b_ed.in = b_button.out;
+    player_b_submit = b_ed.out;
+    
+  }
+}

@@ -1,0 +1,115 @@
+module game_Controller (
+    input clk,  // clock
+    input rst,  // reset
+    input a_input[3],
+    input a_submit,
+    input b_input[3],
+    input b_submit,
+    output player_a_score_display[16],
+    output player_b_score_display[16],
+    output question_A_display[16],
+    output question_B_display[16],
+    output question_Logic_display[20],
+    output time_countdown[16],
+    output round_display[16],
+    output winner_a,
+    output winner_b
+  ) {
+  alu_component alu;
+  .clk(clk){
+    .rst(rst){
+      game_regFiles regfiles;
+      game_fsm controlUnit;
+      }
+    }
+  sig input_B_ALU[16];
+  sig aluOutputBackFSM[16]; 
+
+  always {
+  
+    controlUnit.a_input = a_input;
+    controlUnit.a_submit = a_submit;
+    controlUnit.b_input = b_input;
+    controlUnit.b_submit = b_submit;
+    
+    regfiles.init = controlUnit.initReg;
+    regfiles.reset = controlUnit.resetReg;
+    regfiles.ts = controlUnit.ts;
+    
+    regfiles.we = controlUnit.werf;
+    regfiles.read_address_a = controlUnit.ra;
+    regfiles.read_address_b = controlUnit.rb;
+    regfiles.write_address = controlUnit.rc;
+    
+    case(controlUnit.bsel){
+      b00: input_B_ALU = regfiles.out_b;
+      b01: input_B_ALU = 16h0000;
+      b10: input_B_ALU = 16h0001;
+      b11: input_B_ALU = 16h0005;
+      default: input_B_ALU = 0;
+      }
+    
+    alu.a = regfiles.out_a;
+    alu.b = input_B_ALU;
+    alu.alufn_signal = controlUnit.alufn_signal;
+  
+     case(controlUnit.aluResultSelect){ //WDSEL MUX
+      b1: aluOutputBackFSM = alu.out;
+      default: aluOutputBackFSM = 16hEFFF;
+     }
+   
+     controlUnit.aluresult = aluOutputBackFSM;
+    
+     case(controlUnit.wdsel){
+      b0: regfiles.data = alu.out;
+      b1: regfiles.data = controlUnit.fsminput;
+      default: regfiles.data = 16h0000;
+      }
+    
+    
+    player_a_score_display = regfiles.player_a_score_display; //STATIC DISPLAY
+    player_b_score_display = regfiles.player_b_score_display; //STATIC DISPLAY
+    question_A_display = regfiles.question_A_display; //STATIC DISPLAY
+    question_B_display = regfiles.question_B_display; //STATIC DISPLAY
+    time_countdown = regfiles.time_countdown; //STATIC DISPLAY
+    round_display = regfiles.round_display; //STATIC DISPLAY
+    
+    winner_a = controlUnit.winner_a; //STATIC DISPLAY
+    winner_b = controlUnit.winner_b; //STATIC DISPLAY
+    
+    case(regfiles.question_Logic_display){ //STATIC DISPLAY FOR BOOLEAN LOGIC
+      3b000: 
+        question_Logic_display[19:15] = 5h0A;
+        question_Logic_display[14:10] = 5h14;
+        question_Logic_display[9:5] = 5h0D;
+        question_Logic_display[4:0] = 5h1F;
+      3b001:
+        question_Logic_display[19:15] = 5h14;
+        question_Logic_display[14:10] = 5h0A;
+        question_Logic_display[9:5] = 5h14;
+        question_Logic_display[4:0] = 5h0D;
+      3b010:
+        question_Logic_display[19:15] = 5h00;
+        question_Logic_display[14:10] = 5h10;
+        question_Logic_display[9:5] = 5h1F;
+        question_Logic_display[4:0] = 5h1F;
+      3b011:
+        question_Logic_display[19:15] = 5h14;
+        question_Logic_display[14:10] = 5h00;
+        question_Logic_display[9:5] = 5h10;
+        question_Logic_display[4:0] = 5h1F;
+      3b100:
+        question_Logic_display[19:15] = 5h13;
+        question_Logic_display[14:10] = 5h00;
+        question_Logic_display[9:5] = 5h10;
+        question_Logic_display[4:0] = 5h1F;
+      3b101:
+        question_Logic_display[19:15] = 5h14;
+        question_Logic_display[14:10] = 5h13;
+        question_Logic_display[9:5] = 5h00;
+        question_Logic_display[4:0] = 5h10;
+      default:
+        question_Logic_display = 20hFFFFF;
+      }
+  }
+}

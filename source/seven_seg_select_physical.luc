@@ -1,0 +1,20 @@
+module seven_seg_select_physical (
+    input in[2], //Input from the seven_seg_counter
+    output out[4] //Output to io.sel which select the digit.
+  ) {
+
+  always {
+    out = 4b1111;//Predefine value for out
+    case(in){
+      2b00: //The state from seven_seg_counter
+        out = 4b0001;//Return output to choose the first digit
+      2b01:
+        out = 4b0010;//Return output to choose the second digit
+      2b10:
+        out = 4b0100;//Return output to choose the third digit
+      2b11:
+        out = 4b1000;//Return output to choose the fourth digit
+      default: out = 4h0;//Default set to off for all
+      }
+  }
+}

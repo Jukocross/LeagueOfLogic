@@ -1,0 +1,17 @@
+module compareUnit (
+    input z[1],
+    input v[1],
+    input n[1],
+    input alufn_signal[6],
+    output out[16]
+  ) {
+
+  always {
+    case (alufn_signal[2:1]) {
+      b01: out = 16b0 + z;
+      b10: out = 16b0 + (n ^ v);
+      b11: out = 16b0 + (z | (n ^ v));
+      default: out = 16b0;
+      }
+  }
+}

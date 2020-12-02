@@ -1,0 +1,25 @@
+module seven_seg_select_value (
+    input in[2],//Input from the seven_seg_counter.
+    input value[20],//Actual input from the SL or the manual inputs.
+    output out[8]//Output the value for the selected digit.
+  ) {
+  seven_seg seg;
+  always {
+    seg.char = 0;//Predefining the value of seg.char.
+    case(in){
+      2b00: 
+        seg.char = value[4:0];
+        out = seg.segs;//Output the value for the selected digit representing A.
+      2b01: 
+        seg.char = value[9:5];
+        out = seg.segs;//Output the value for the selected digit representing B.
+      2b10: 
+        seg.char = value[14:10];
+        out = seg.segs;//Output the value for the selected digit representing Cin.
+      2b11:
+        seg.char = value[19:15];
+        out = seg.segs;
+      default: out = 8hFF;
+      }
+  }
+}
