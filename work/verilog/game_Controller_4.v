@@ -218,8 +218,8 @@ module game_Controller_4 (
         question_Logic_display[0+4-:5] = 5'h1f;
       end
       3'h5: begin
-        question_Logic_display[15+4-:5] = 5'h14;
-        question_Logic_display[10+4-:5] = 5'h13;
+        question_Logic_display[15+4-:5] = 5'h13;
+        question_Logic_display[10+4-:5] = 5'h14;
         question_Logic_display[5+4-:5] = 5'h00;
         question_Logic_display[0+4-:5] = 5'h10;
       end

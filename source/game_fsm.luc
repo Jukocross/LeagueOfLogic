@@ -69,7 +69,7 @@ module game_fsm (
               fsminput = randomGenerator.threeBitValue;
               full_fsm.d = full_fsm.QUESTION_GETLOGIC;
       full_fsm.QUESTION_GETLOGIC:
-              if(previousLogic.q != randomGenerator.threeBitValue && randomGenerator.threeBitValue <=5){
+             if(previousLogic.q != randomGenerator.threeBitValue && randomGenerator.threeBitValue <=5){
              werf = 1;
              rc = h5;
              wdsel = 1b1;
@@ -97,7 +97,7 @@ module game_fsm (
       full_fsm.QUESTION_GETTIMER:
             werf = 1;
             rc = h2;
-            fsminput = 16h0005;
+            fsminput = 16h000F;
             wdsel = 1b1;
             full_fsm.d = full_fsm.COUNTDOWN_IDLE;
       full_fsm.COUNTDOWN_IDLE:
@@ -215,10 +215,10 @@ module game_fsm (
               ts = 1;
               ra = h2;
               bsel = 2b01;
-              alufn_signal = 6b11011;
+              alufn_signal = 6b110011;
               aluResultSelect = 1;
               if  (aluresult == 1){
-                full_fsm.d = full_fsm.IDLE;
+                full_fsm.d = full_fsm.RESET;
           }
       full_fsm.DISPLAYWINNERB:
               winner_b = 1;
@@ -228,17 +228,13 @@ module game_fsm (
               alufn_signal = 6b110011;
               aluResultSelect = 1;
               if  (aluresult == 1){
-                full_fsm.d = full_fsm.IDLE;
-          }
-      full_fsm.IDLE:
-            if (a_submit == 1 || b_submit == 1 ){
-              full_fsm.d = full_fsm.RESET;
+                full_fsm.d = full_fsm.RESET;
           }
       full_fsm.RESET:
                resetReg = 1;
                full_fsm.d = full_fsm.START;
       default: 
-               full_fsm.d = full_fsm.IDLE;
+               full_fsm.d = full_fsm.RESET;
       }
     
   }

@@ -24,13 +24,13 @@ module seven_seg_12 (
         segs = 8'ha4;
       end
       8'h03: begin
-        segs = 8'hb0;
+        segs = 8'hb4;
       end
       8'h04: begin
         segs = 8'h99;
       end
       8'h05: begin
-        segs = 8'h92;
+        segs = 8'h96;
       end
       8'h06: begin
         segs = 8'h82;
@@ -76,6 +76,9 @@ module seven_seg_12 (
       end
       8'h14: begin
         segs = 8'hc8;
+      end
+      8'h15: begin
+        segs = 8'hd5;
       end
       default: begin
         segs = 8'hff;

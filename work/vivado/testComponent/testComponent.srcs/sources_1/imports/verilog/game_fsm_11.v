@@ -86,12 +86,12 @@ module game_fsm_11 (
     case (M_full_fsm_q)
       START_full_fsm: begin
         if (a_submit == 1'h1 || b_submit == 1'h1) begin
-          M_full_fsm_d = INIT_full_fsm;
+          M_full_fsm_d = QUESTION_GETA_full_fsm;
         end
       end
       INIT_full_fsm: begin
         initReg = 1'h1;
-        M_full_fsm_d = QUESTION_GETA_full_fsm;
+        M_full_fsm_d = START_full_fsm;
       end
       QUESTION_GETA_full_fsm: begin
         werf = 1'h1;
@@ -153,7 +153,7 @@ module game_fsm_11 (
       QUESTION_GETTIMER_full_fsm: begin
         werf = 1'h1;
         rc = 4'h2;
-        fsminput = 16'h0005;
+        fsminput = 16'h000f;
         wdsel = 1'h1;
         M_full_fsm_d = COUNTDOWN_IDLE_full_fsm;
       end
@@ -281,10 +281,10 @@ module game_fsm_11 (
         ts = 1'h1;
         ra = 4'h2;
         bsel = 2'h1;
-        alufn_signal = 6'h1b;
+        alufn_signal = 6'h33;
         aluResultSelect = 1'h1;
         if (aluresult == 1'h1) begin
-          M_full_fsm_d = IDLE_full_fsm;
+          M_full_fsm_d = RESET_full_fsm;
         end
       end
       DISPLAYWINNERB_full_fsm: begin
@@ -295,20 +295,15 @@ module game_fsm_11 (
         alufn_signal = 6'h33;
         aluResultSelect = 1'h1;
         if (aluresult == 1'h1) begin
-          M_full_fsm_d = IDLE_full_fsm;
-        end
-      end
-      IDLE_full_fsm: begin
-        if (a_submit == 1'h1 || b_submit == 1'h1) begin
           M_full_fsm_d = RESET_full_fsm;
         end
       end
       RESET_full_fsm: begin
         resetReg = 1'h1;
-        M_full_fsm_d = START_full_fsm;
+        M_full_fsm_d = INIT_full_fsm;
       end
       default: begin
-        M_full_fsm_d = IDLE_full_fsm;
+        M_full_fsm_d = INIT_full_fsm;
       end
     endcase
   end

@@ -42,15 +42,15 @@ module au_top (
     
     game.a_input = player_a_input;
     game.b_input = player_b_input;
-    game.b_submit = buttons.player_a_submit;
-    game.a_submit = buttons.player_b_submit;
+    game.a_submit = buttons.player_a_submit;
+    game.b_submit = buttons.player_b_submit;
     
            
     logic_display_segValue = game.question_Logic_display;
     section_A_segValue[19:15] = 5h1F;    
     section_A_segValue[14:10] = game.question_A_display[2:0];
     section_A_segValue[9:5] = game.round_display[2:0];
-    section_A_segValue[4:0] = game.time_countdown[2:0];
+    section_A_segValue[4:0] = game.time_countdown[3:0];
     section_B_segValue[19:15] = 5h1F;
     section_B_segValue[14:10] = game.player_a_score_display[2:0];
     section_B_segValue[9:5] = game.player_b_score_display[2:0];
@@ -64,6 +64,28 @@ module au_top (
     
     section_A_seg = section_A_seg_value.out[6:0];
     section_B_seg = section_B_seg_value.out[6:0];
+    
+    
+    if (game.winner_a == 1){
+      section_A_seg = 7h00;
+      section_B_seg = 7h00;
+      logic_display_segValue[19:15] = 5h0A;
+      logic_display_segValue[14:10] = 5h15;  
+      logic_display_segValue[9:5] = 5h00;
+      logic_display_segValue[4:0] = 5h14;
+      io_seg = seven_seg_value.out[6:0];
+      io_sel = digit.out;
+      }
+    if (game.winner_b == 1){
+      section_B_seg = 7h00;
+      section_B_seg = 7h00;
+      logic_display_segValue[19:15] = 5h0B;
+      logic_display_segValue[14:10] = 5h15;
+      logic_display_segValue[9:5] = 5h00;
+      logic_display_segValue[4:0] = 5h14;
+      io_seg = seven_seg_value.out[6:0];
+      io_sel = digit.out;
+      }
     
   }
 }

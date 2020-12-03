@@ -2,8 +2,8 @@
 # Vivado v2020.1 (64-bit)
 # SW Build 2902540 on Wed May 27 19:54:49 MDT 2020
 # IP Build 2902112 on Wed May 27 22:43:36 MDT 2020
-# Start of session at: Wed Dec  2 01:37:10 2020
-# Process ID: 4352
+# Start of session at: Thu Dec  3 02:28:15 2020
+# Process ID: 20524
 # Current directory: C:/Users/YK/Desktop/School/50.002 Comp Struc/Alchitry/testComponent/work/vivado/testComponent/testComponent.runs/impl_1
 # Command line: vivado.exe -log au_top_0.vdi -applog -product Vivado -messageDb vivado.pb -mode batch -source au_top_0.tcl -notrace
 # Log file: C:/Users/YK/Desktop/School/50.002 Comp Struc/Alchitry/testComponent/work/vivado/testComponent/testComponent.runs/impl_1/au_top_0.vdi

@@ -114,8 +114,8 @@ module au_top_0 (
     M_buttons_io_button = player_submit;
     M_game_a_input = player_a_input;
     M_game_b_input = player_b_input;
-    M_game_b_submit = M_buttons_player_a_submit;
-    M_game_a_submit = M_buttons_player_b_submit;
+    M_game_a_submit = M_buttons_player_a_submit;
+    M_game_b_submit = M_buttons_player_b_submit;
     logic_display_segValue = M_game_question_Logic_display;
     section_A_segValue[15+4-:5] = 5'h1f;
     section_A_segValue[10+4-:5] = M_game_question_A_display[0+2-:3];
@@ -131,5 +131,25 @@ module au_top_0 (
     section_B_sel = M_digit_out[0+2-:3];
     section_A_seg = M_section_A_seg_value_out[0+6-:7];
     section_B_seg = M_section_B_seg_value_out[0+6-:7];
+    if (M_game_winner_a == 1'h1) begin
+      section_A_seg = 7'h00;
+      section_B_seg = 7'h00;
+      logic_display_segValue[15+4-:5] = 5'h0a;
+      logic_display_segValue[10+4-:5] = 5'h15;
+      logic_display_segValue[5+4-:5] = 5'h00;
+      logic_display_segValue[0+4-:5] = 5'h14;
+      io_seg = M_seven_seg_value_out[0+6-:7];
+      io_sel = M_digit_out;
+    end
+    if (M_game_winner_b == 1'h1) begin
+      section_B_seg = 7'h00;
+      section_B_seg = 7'h00;
+      logic_display_segValue[15+4-:5] = 5'h0b;
+      logic_display_segValue[10+4-:5] = 5'h15;
+      logic_display_segValue[5+4-:5] = 5'h00;
+      logic_display_segValue[0+4-:5] = 5'h14;
+      io_seg = M_seven_seg_value_out[0+6-:7];
+      io_sel = M_digit_out;
+    end
   end
 endmodule
